@@ -23,11 +23,11 @@ export class TaskService {
     return this.taskRepository.find();
   }
 
-  // Marcar tarea como completada
-  async complete(id: number): Promise<Task> {
+  // Marcar tarea como completada o revertir
+  async toggle(id: number): Promise<Task | null> {
     const task = await this.taskRepository.findOne({ where: { id } });
     if (task) {
-      task.completed = true;
+      task.completed = !task.completed;
       return this.taskRepository.save(task);
     }
     return null;

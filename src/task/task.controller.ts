@@ -18,9 +18,9 @@ export class TaskController {
   }
 
   // Marcar tarea como completada
-  @Post(':id/complete')
+  @Post(':id/toggle')
   complete(@Param('id') id: number) {
-    return this.taskService.complete(id);
+    return this.taskService.toggle(id);
   }
 
   // Eliminar una tarea

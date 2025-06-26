@@ -28,7 +28,13 @@ export class AuthController {
     try {
       return await this.authService.register(registerDto);
     } catch (error) {
-      throw new ConflictException(error.message);
+      if (error.message.includes('username')) {
+        throw new ConflictException('El nombre de usuario ya está en uso');
+      } else if (error.message.includes('email')) {
+        throw new ConflictException('El email ya está registrado');
+      } else {
+        throw new ConflictException(error.message);
+      }
     }
   }
 }

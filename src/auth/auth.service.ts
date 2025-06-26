@@ -1,8 +1,9 @@
 // src/auth/auth.service.ts
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { GoogleAuthService } from './google-auth.service';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -51,5 +52,37 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException('Invalid Google token');
     }
+  }
+
+  async register(registerDto: RegisterDto) {
+    // Verificar si el usuario ya existe
+    const existingUserByUsername = await this.usersService.findByUsername(registerDto.username);
+    if (existingUserByUsername) {
+      throw new ConflictException('El nombre de usuario ya está en uso');
+    }
+
+    const existingUserByEmail = await this.usersService.findByEmail(registerDto.email);
+    if (existingUserByEmail) {
+      throw new ConflictException('El email ya está registrado');
+    }
+
+    // Crear el usuario
+    const user = await this.usersService.create(
+      registerDto.username,
+      registerDto.password,
+      registerDto.email,
+    );
+
+    // Generar JWT
+    const payload = { username: user.username, sub: user.id, email: user.email };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+      },
+    };
   }
 }

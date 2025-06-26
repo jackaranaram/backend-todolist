@@ -1,18 +1,32 @@
-import { Controller, Get, Post, Param, Body, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Delete, UseGuards, Request } from '@nestjs/common';
 import { TaskService } from './task.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UsersService } from '../users/users.service';
 
 @Controller('tasks')
+@UseGuards(JwtAuthGuard)
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(
+    private readonly taskService: TaskService,
+    private readonly usersService: UsersService,
+  ) {}
 
-  // Crear una nueva tarea
+  // Crear una nueva tarea para el usuario autenticado
   @Post()
-  create(@Body('title') title: string) {
-    return this.taskService.create(title);
+  async create(@Body('title') title: string, @Request() req) {
+    const user = await this.usersService.findByUsername(req.user.username);
+    return this.taskService.create(title, user);
   }
 
-  // Obtener todas las tareas
+  // Obtener todas las tareas del usuario autenticado
   @Get()
+  async findMyTasks(@Request() req) {
+    const user = await this.usersService.findByUsername(req.user.username);
+    return this.taskService.findByUser(user.id);
+  }
+
+  // Obtener todas las tareas (solo para administradores o desarrollo)
+  @Get('all')
   findAll() {
     return this.taskService.findAll();
   }

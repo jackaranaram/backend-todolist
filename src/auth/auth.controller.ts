@@ -1,6 +1,7 @@
 // src/auth/auth.controller.ts
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { GoogleLoginDto } from './dto/google-login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,5 +15,10 @@ export class AuthController {
     );
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
     return this.authService.login(user);
+  }
+
+  @Post('google')
+  async googleLogin(@Body() googleLoginDto: GoogleLoginDto) {
+    return this.authService.googleLogin(googleLoginDto.idToken);
   }
 }

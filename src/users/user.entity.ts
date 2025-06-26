@@ -10,8 +10,23 @@ export class User {
   @Column({ unique: true })
   username: string;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column({ nullable: true })
+  googleId: string;
+
+  @Column({ nullable: true })
+  name: string;
+
+  @Column({ nullable: true })
+  picture: string;
+
+  @Column({ default: false })
+  emailVerified: boolean;
 
   @OneToMany(() => Task, (task) => task.user)
   tasks: Task[];

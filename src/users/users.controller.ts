@@ -15,6 +15,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 interface CreateUserDto {
   username: string;
   password: string;
+  email: string;
 }
 
 @Controller('users')
@@ -24,16 +25,22 @@ export class UsersController {
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     try {
-      const { username, password } = createUserDto;
+      const { username, password, email } = createUserDto;
       
-      // Verificar si el usuario ya existe
+      // Verificar si el usuario ya existe por username
       const existingUser = await this.usersService.findByUsername(username);
       if (existingUser) {
         throw new HttpException('Username already exists', HttpStatus.CONFLICT);
       }
 
+      // Verificar si el email ya existe
+      const existingEmail = await this.usersService.findByEmail(email);
+      if (existingEmail) {
+        throw new HttpException('Email already exists', HttpStatus.CONFLICT);
+      }
+
       // Crear el nuevo usuario
-      const user = await this.usersService.create(username, password);
+      const user = await this.usersService.create(username, password, email);
       
       // Retornar usuario sin la contraseña
       const { password: _, ...result } = user;

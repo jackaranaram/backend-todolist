@@ -32,4 +32,15 @@ export class UsersService {
     }
     return null;
   }
+
+  async findById(id: number): Promise<User | undefined> {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
+  async findWithTasks(id: number): Promise<User | undefined> {
+    return this.usersRepository.findOne({ 
+      where: { id },
+      relations: ['tasks']
+    });
+  }
 }

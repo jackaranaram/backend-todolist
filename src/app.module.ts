@@ -25,7 +25,7 @@ import { User } from './users/user.entity';
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
         entities: [Task, User],
-        synchronize: false, // Volver a false para seguridad
+        synchronize: true, // Volver a false para seguridad
         migrationsRun: true,
         ssl: configService.get<string>('DATABASE_SSL') === 'true' ? { rejectUnauthorized: false } : false,
       }),
